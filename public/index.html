@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Guess the Game</title>
+  </head>
+  <body>
+    <h1>Guess the Game!</h1>
+    <div id="game"></div>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+      const getRandomIndex = (array) => {
+        return Math.floor(Math.random() * array.length);
+      };
+
+      const createGame = (games) => {
+        const game = games[getRandomIndex(games)];
+        const image = document.createElement('img');
+        image.setAttribute('src', game.cover.url.replace('t_thumb', 't_720p'));
+        const form = document.createElement('form');
+        const input = document.createElement('input');
+        input.setAttribute('type', 'text');
+        const button = document.createElement('button');
+        button.textContent = 'Guess';
+        button.addEventListener('click', (event) => {
+          event.preventDefault();
+          const guess = input.value.toLowerCase();
+          const name = game.name.toLowerCase();
+          if (guess === name) {
+            alert('Correct!');
+            createGame(games);
+          } else {
+            alert('Incorrect!');
+          }
+        });
+        form.appendChild(input);
+        form.appendChild(button);
+        const gameDiv = document.querySelector('#game');
+        gameDiv.innerHTML = '';
+        gameDiv.appendChild(image);
+        gameDiv.appendChild(form);
+        input.focus();
+      };
+
+      axios.get('/api/games')
+        .then((response) => {
+          const games = response.data;
+          createGame(games);
+        });
+    </script>
+  </body>
+</html>
